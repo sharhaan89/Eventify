@@ -2,14 +2,14 @@ import express from 'express';
 import mongoose from 'mongoose';
 import { Log } from './models/logs.js';
 import { Signupdata } from "./models/signupdata.js";
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 mongoose.connect("mongodb://localhost:27017/Logs")
 const app = express()
 const port = 3000
-
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
 
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json());
@@ -40,14 +40,20 @@ app.get("/",(req,res)=>{
 
 
 //TO POST THE SIGN UP DETAILS
-app.post("/signup",async (req,res)=>{
-    const { username, email, password, confirmation}=req.body
-    const sudata=new signupdata (req.body)
-    await sudata.save()
-    console.log(sudata)
-    res.status(200).send("SIGN UP CREDENTIALS ADDED TO DB")
-    res.status(500).send("USER NAME ALREADY EXISTS")
-})
+app.post("/signup", async (req, res) => {
+  const { username, email, password, confirmation } = req.body;
+
+  const existingUser = await Signupdata.findOne({ username });
+  if (existingUser) {
+    return res.status(409).send("USER NAME ALREADY EXISTS");
+  }
+
+  const sudata = new Signupdata(req.body);
+  await sudata.save();
+  console.log(sudata);
+  res.status(200).send("SIGN UP CREDENTIALS ADDED TO DB");
+});
+
 
 
 
