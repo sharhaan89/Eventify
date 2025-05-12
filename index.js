@@ -34,9 +34,11 @@ app.post('/add-logs', async (req, res) => {
   res.status(200).send('Log added successfully!');
 });
 
+app.use(express.static(path.join(__dirname, "Eventify Front End")));
+
 //CONNECTING FRONTEND
 app.get("/",(req,res)=>{
-    res.sendFile(path.join(__dirname,"signup.html"))
+    res.sendFile(path.join(__dirname, "Eventify Front End", "signup.html"));
 })
 
 
