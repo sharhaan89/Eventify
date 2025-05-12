@@ -1,10 +1,14 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import { Log } from './models/logs.js';
-import { Signupdata } from "./models/signupdata.js";
 import path from 'path';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config();
+import { Signupdata } from "./models/signupdata.js";
 import { fileURLToPath } from 'url';
+import userRoutes from './routes/userRoutes.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -15,53 +19,37 @@ const port = 3000
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json());
 
-app.post('/add-logs', async (req, res) => {
-  const { Room, fromTime, toTime } = req.body;
-
-  // Check for overlapping bookings in the same room
-  const conflictingLog = await Log.findOne({
-    Room,
-    fromTime: { $lt: new Date(toTime) },
-    toTime: { $gt: new Date(fromTime) }
-  });
-
-  if (conflictingLog) {
-    return res.status(409).send('Room is already booked during the requested time period.');
-  }
-
-  const log = new Log(req.body);
-  await log.save();
-  res.status(200).send('Log added successfully!');
-});
+//Routes
+app.use("/users", userRoutes);
 
 app.use(express.static(path.join(__dirname, "Eventify Front End")));
 
 //CONNECTING FRONTEND
-app.get("/",(req,res)=>{
-    res.sendFile(path.join(__dirname, "Eventify Front End", "signup.html"));
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "Eventify Front End", "signup.html"));
 })
 
 
 //TO POST THE SIGN UP DETAILS
 app.post("/signup", async (req, res) => {
   const { username, email, password, confirmation, role } = req.body;
-//CHECKING PASSWORD AND CONFIRM PASSWORD
-    if (password != confirmation) {
+  //CHECKING PASSWORD AND CONFIRM PASSWORD
+  if (password !== confirmation) {
     return res.status(400).send("Passwords do not match.");
   }
-//CHECKING MAIL EXISTANCE
+  //CHECKING MAIL EXISTANCE
   const existingemail = await Signupdata.findOne({ email });
-   if (existingemail) {
+  if (existingemail) {
     return res.status(409).send("EMAIL ALREADY EXISTS");
   }
-//CHECKING USERNAME EXISTANCE
+  //CHECKING USERNAME EXISTANCE
   const existingUser = await Signupdata.findOne({ username });
   if (existingUser) {
     return res.status(409).send("USER NAME ALREADY EXISTS");
   }
-//HASHING THE PASSWORD
+  //HASHING THE PASSWORD
   const hashedPassword = await bcrypt.hash(password, 10);
-    const sudata = new Signupdata({
+  const sudata = new Signupdata({
     username,
     email,
     password: hashedPassword,
@@ -75,19 +63,34 @@ app.post("/signup", async (req, res) => {
 
 
 //LOG IN
-app.post("/login",async(req,res)=>{
-    const{email,password}=req.body
-    //SEARCHING USER
-    const user =await Signupdata.findOne({email})
-    if(!user)
-        res.status(400).send("USER NOT FOUND")
-    //VERIFYING PASSWORD
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await Signupdata.findOne({ email });
+    if (!user) {
+      return res.status(404).send("USER NOT FOUND");
+    }
+
     const match = await bcrypt.compare(password, user.password);
-    if (!match) 
+    if (!match) {
       return res.status(400).send("Incorrect password.");
-    if(user && match)
-        res.status(200).send("YOU HAVE LOGGED IN")
-})
+    }
+
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    res.status(200).json({ token });
+
+  } catch (err) {
+    console.error("Login error:", err);
+    res.status(500).send("Internal server error.");
+  }
+});
+
 
 
 app.listen(port, () => {

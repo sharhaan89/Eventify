@@ -11,7 +11,6 @@ const signupschema = new mongoose.Schema({
         unique:true,
     },
     password: String,
-    confirmation: String,
     role: {
         type: String,
         enum: ["Manager", "Student"], default: "Student"
