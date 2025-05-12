@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { Log } from './models/logs.js';
 import { Signupdata } from "./models/signupdata.js";
 import path from 'path';
+import bcrypt from 'bcrypt';
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -43,12 +44,23 @@ app.get("/",(req,res)=>{
 app.post("/signup", async (req, res) => {
   const { username, email, password, confirmation } = req.body;
 
+    if (password !== confirmation) {
+    return res.status(400).send("Passwords do not match.");
+  }
+
   const existingUser = await Signupdata.findOne({ username });
   if (existingUser) {
     return res.status(409).send("USER NAME ALREADY EXISTS");
   }
 
-  const sudata = new Signupdata(req.body);
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+    const sudata = new Signupdata({
+    username,
+    email,
+    password: hashedPassword
+  });
+
   await sudata.save();
   console.log(sudata);
   res.status(200).send("SIGN UP CREDENTIALS ADDED TO DB");
