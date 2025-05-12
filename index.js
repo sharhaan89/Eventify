@@ -42,7 +42,7 @@ app.get("/",(req,res)=>{
 
 //TO POST THE SIGN UP DETAILS
 app.post("/signup", async (req, res) => {
-  const { username, email, password, confirmation } = req.body;
+  const { username, email, password, confirmation, role } = req.body;
 
     if (password !== confirmation) {
     return res.status(400).send("Passwords do not match.");
@@ -58,7 +58,8 @@ app.post("/signup", async (req, res) => {
     const sudata = new Signupdata({
     username,
     email,
-    password: hashedPassword
+    password: hashedPassword,
+    role
   });
 
   await sudata.save();
