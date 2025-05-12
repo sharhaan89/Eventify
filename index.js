@@ -43,18 +43,22 @@ app.get("/",(req,res)=>{
 //TO POST THE SIGN UP DETAILS
 app.post("/signup", async (req, res) => {
   const { username, email, password, confirmation, role } = req.body;
-
-    if (password !== confirmation) {
+//CHECKING PASSWORD AND CONFIRM PASSWORD
+    if (password != confirmation) {
     return res.status(400).send("Passwords do not match.");
   }
-
+//CHECKING MAIL EXISTANCE
+  const existingemail = await Signupdata.findOne({ email });
+   if (existingemail) {
+    return res.status(409).send("EMAIL ALREADY EXISTS");
+  }
+//CHECKING USERNAME EXISTANCE
   const existingUser = await Signupdata.findOne({ username });
   if (existingUser) {
     return res.status(409).send("USER NAME ALREADY EXISTS");
   }
-
+//HASHING THE PASSWORD
   const hashedPassword = await bcrypt.hash(password, 10);
-
     const sudata = new Signupdata({
     username,
     email,
@@ -68,6 +72,20 @@ app.post("/signup", async (req, res) => {
 });
 
 
+//LOG IN
+app.post("/login",async(req,res)=>{
+    const{email,password}=req.body
+    //SEARCHING USER
+    const user =await Signupdata.findOne({email})
+    if(!user)
+        res.status(400).send("USER NOT FOUND")
+    //VERIFYING PASSWORD
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) 
+      return res.status(400).send("Incorrect password.");
+    if(user && match)
+        res.status(200).send("YOU HAVE LOGGED IN")
+})
 
 
 app.listen(port, () => {
