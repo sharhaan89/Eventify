@@ -1,11 +1,12 @@
 import express from "express";
 import { verifyToken } from "../middlewares/authMiddleware.js";
-import { handleUserLogin, handleUserSignup } from "../controllers/userController.js";
+import { handleGetUserRegistrations, handleUserLogin, handleUserSignup } from "../controllers/userController.js";
 
 const router = express.Router();
 
 router.post("/login", handleUserLogin);
 router.post("/signup", handleUserSignup);
+router.get("/:id/registrations", handleGetUserRegistrations);
 
 // Both Manager and Student can access this router
 router.get("/Student",verifyToken, (req, res) => {

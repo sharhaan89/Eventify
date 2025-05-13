@@ -52,3 +52,7 @@ export async function handleUserLogin(req, res) {
     res.status(500).send("Internal server error.");
   }
 }
+
+export async function handleGetUserRegistrations(req, res) {
+    
+}
