@@ -1,7 +1,9 @@
 import User from "../models/User.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 export async function handleUserSignup(req, res) {
-    const { username, email, password, confirmation, role } = req.body;
+    const { username, email, password, confirmation, organization, role } = req.body;
 
     if (password !== confirmation) {
     return res.status(400).send("Passwords do not match.");
@@ -12,18 +14,19 @@ export async function handleUserSignup(req, res) {
     return res.status(409).send("EMAIL ALREADY EXISTS");
     }
 
-    const existingUser = await Signupdata.findOne({ username });
+    const existingUser = await User.findOne({ username });
     if (existingUser) {
     return res.status(409).send("USER NAME ALREADY EXISTS");
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const sudata = new Signupdata({
+    const sudata = new User({
     username,
     email,
     password: hashedPassword,
-    role,
+    organization,
+    role
     });
 
     await sudata.save();
@@ -34,7 +37,7 @@ export async function handleUserLogin(req, res) {
       try {
     const { email, password } = req.body;
 
-    const user = await Signupdata.findOne({ email });
+    const user = await User.findOne({ email });
     if (!user) return res.status(404).send("USER NOT FOUND");
 
     const match = await bcrypt.compare(password, user.password);

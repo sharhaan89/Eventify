@@ -6,7 +6,6 @@ const router = express.Router();
 
 router.post("/login", handleUserLogin);
 router.post("/signup", handleUserSignup);
-router.get("/:id/registrations", handleGetUserRegistrations);
 
 // Both Manager and Student can access this router
 router.get("/Student",verifyToken, (req, res) => {
