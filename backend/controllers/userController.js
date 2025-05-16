@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
+
 import jwt from "jsonwebtoken";
 
 export async function handleUserSignup(req, res) {
@@ -34,7 +35,7 @@ export async function handleUserSignup(req, res) {
 }
 
 export async function handleUserLogin(req, res) {
-      try {
+  try {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
@@ -49,7 +50,15 @@ export async function handleUserLogin(req, res) {
       { expiresIn: "1h" }
     );
 
-    res.status(200).json({ token });
+    // Send JWT as HTTP-only cookie
+    res.cookie("token", token, {
+      httpOnly: true,    
+      //secure: process.env.NODE_ENV === "production", // use HTTPS in prod
+      sameSite: "strict",    
+      maxAge: 60 * 60 * 1000 * 24
+    });
+
+    res.status(200).json({ message: "Login successful" });
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).send("Internal server error.");

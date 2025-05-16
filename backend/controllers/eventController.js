@@ -1,26 +1,55 @@
 import Event from "../models/Event.js";
 
 export async function handleCreateEvent(req, res) {
-  if (req.user.role !== "Manager") {
-    return res.status(403).json({ message: "Access denied: Managers only" });
+  try {
+    if (req.user.role !== "Manager") {
+      return res.status(403).json({ message: "Access denied: Managers only" });
+    }
+
+    const { title, description, venue, fromTime, toTime, club, event } = req.body;
+
+    // Basic validation for required fields
+    if (!title || !venue || !fromTime || !toTime || !club ) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const from = new Date(fromTime);
+    const to = new Date(toTime);
+
+    if (from > to) {
+      return res.status(400).json({ message: "'fromTime' must be before 'toTime'" });
+    }
+
+    // Check for overlapping bookings in the same venue
+    const conflictingLog = await Event.findOne({
+      venue,
+      fromTime: { $lt: to },
+      toTime: { $gt: from },
+    });
+
+    if (conflictingLog) {
+      return res.status(409).json({ message: "Room is already booked during the requested time period." });
+    }
+
+    // Create the event with createdBy from req.user._id
+    const newEvent = new Event({
+      title,
+      description,
+      venue,
+      fromTime: from,
+      toTime: to,
+      createdBy: req.user.id,
+      club,
+      event,
+    });
+
+    await newEvent.save();
+
+    res.status(201).json({ message: "Event created successfully!", event: newEvent });
+  } catch (err) {
+    console.error("Error creating event:", err);
+    res.status(500).json({ message: "Internal server error" });
   }
-
-  const {title, description, venue, fromTime, toTime, createdBy } = req.body;
-
-  // Check for overlapping bookings in the same room
-  const conflictingLog = await Event.findOne({
-    venue,
-    fromTime: { $lt: new Date(toTime) },
-    toTime: { $gt: new Date(fromTime) }
-  });
-
-  if (conflictingLog) {
-    return res.status(409).send("Room is already booked during the requested time period.");
-  }
-
-  const log = new Event(req.body);
-  await log.save();
-  res.status(200).send("Log added successfully!");
 }
 
 // Get all the events from the database using the Event model

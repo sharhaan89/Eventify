@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 import userRoutes from './routes/userRoutes.js';
 import eventRoutes from "./routes/eventRoutes.js";
 import registrationRoutes from "./routes/registrationRoutes.js";
+import cookieParser from "cookie-parser";
 import { error } from 'console';
 
 dotenv.config();
@@ -29,19 +30,21 @@ mongoose.connect("mongodb://localhost:27017/Logs")
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
-
+app.use(cookieParser());
 
 // Routes
 app.use('/users', userRoutes);
 app.use('/events', eventRoutes);
 app.use('/events', registrationRoutes);
 
+/*
 // Serve static files
 app.use(express.static(path.join(__dirname, '..', 'frontend', 'dist')));
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'frontend', 'dist', 'index.html'));
 });
+*/
 
 // Start server
 app.listen(port, () => {
