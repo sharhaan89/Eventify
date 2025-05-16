@@ -1,6 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import path from 'path';
+import cors from 'cors';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import userRoutes from './routes/userRoutes.js';
@@ -26,27 +27,19 @@ mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/Logs", {
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cors());
 
-// Set EJS view engine
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, '..', 'frontend'));
-
-// Serve static files
-app.use(express.static(path.join(__dirname, '..', 'frontend', 'public')));
 
 // Routes
 app.use('/users', userRoutes);
 app.use('/events', eventRoutes);
 app.use('/events', registrationRoutes);
 
-// Root route → render signup page
-app.get('/', (req, res) => {
-  res.render('users/signup'); // corresponds to /frontend/auth/signup.ejs
-});
+// Serve static files
+app.use(express.static(path.join(__dirname, '..', 'frontend', 'dist')));
 
-// 404 fallback
-app.use((req, res) => {
-  res.status(404).render('errors/404'); // frontend/errors/404.ejs
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'frontend', 'dist', 'index.html'));
 });
 
 // Start server

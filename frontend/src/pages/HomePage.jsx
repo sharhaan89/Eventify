@@ -20,8 +20,8 @@ export default function HomePage() {
               </p>
             </div>
             <div className="flex flex-col gap-2 min-[400px]:flex-row">
-              <button onClick={() => navigate('/users/register')} className="flex items-center justify-center rounded-md bg-rose-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-rose-700">
-                Register
+              <button onClick={() => navigate('/users/signup')} className="flex items-center justify-center rounded-md bg-rose-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-rose-700">
+                Signup
                 <ArrowRight className="ml-2 h-4 w-4" />
               </button>
               <button onClick={() => navigate('/events/all')} className="flex items-center justify-center rounded-md border border-gray-300 px-6 py-3 text-sm font-medium transition-colors hover:bg-gray-100">
