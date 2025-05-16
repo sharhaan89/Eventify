@@ -29,7 +29,10 @@ mongoose.connect("mongodb://localhost:27017/Logs")
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL, // 👈 explicitly allow your frontend origin
+  credentials: true               // 👈 allow cookies and headers
+}));
 app.use(cookieParser());
 
 // Routes

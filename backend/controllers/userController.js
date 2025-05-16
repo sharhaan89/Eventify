@@ -4,20 +4,16 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 export async function handleUserSignup(req, res) {
-    const { username, email, password, confirmation, organization, role } = req.body;
-
-    if (password !== confirmation) {
-    return res.status(400).send("Passwords do not match.");
-    }
+    const { username, email, password, organization, role } = req.body;
 
     const existingemail = await User.findOne({ email });
     if (existingemail) {
-    return res.status(409).send("EMAIL ALREADY EXISTS");
+    return res.status(409).json({error: "EMAIL ALREADY EXISTS"});
     }
 
     const existingUser = await User.findOne({ username });
     if (existingUser) {
-    return res.status(409).send("USER NAME ALREADY EXISTS");
+    return res.status(409).json({error: "USER NAME ALREADY EXISTS"});
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -31,7 +27,7 @@ export async function handleUserSignup(req, res) {
     });
 
     await sudata.save();
-    res.status(200).send("SIGN UP CREDENTIALS ADDED TO DB");
+    res.status(200).json({msg: "SIGN UP CREDENTIALS ADDED TO DB"});
 }
 
 export async function handleUserLogin(req, res) {
@@ -39,10 +35,10 @@ export async function handleUserLogin(req, res) {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).send("USER NOT FOUND");
+    if (!user) return res.status(404).json({error: "USER NOT FOUND"});
 
     const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(400).send("Incorrect password.");
+    if (!match) return res.status(400).json({error: "Incorrect password."});
 
     const token = jwt.sign(
       { id: user._id, role: user.role },
@@ -61,7 +57,7 @@ export async function handleUserLogin(req, res) {
     res.status(200).json({ message: "Login successful" });
   } catch (err) {
     console.error("Login error:", err);
-    res.status(500).send("Internal server error.");
+    res.status(500).json({error: "Internal server error."});
   }
 }
 
