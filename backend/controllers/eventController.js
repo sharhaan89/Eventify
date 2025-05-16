@@ -5,7 +5,7 @@ export async function handleCreateEvent(req, res) {
     return res.status(403).json({ message: "Access denied: Managers only" });
   }
 
-  const { Room, fromTime, toTime } = req.body;
+  const {title, description, venue, fromTime, toTime, createdBy } = req.body;
 
   // Check for overlapping bookings in the same room
   const conflictingLog = await Event.findOne({

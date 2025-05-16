@@ -5,8 +5,9 @@ import cors from 'cors';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import userRoutes from './routes/userRoutes.js';
-import eventRoutes from './routes/eventRoutes.js';
-import registrationRoutes from './routes/registrationRoutes.js';
+import eventRoutes from "./routes/eventRoutes.js";
+import registrationRoutes from "./routes/registrationRoutes.js";
+import { error } from 'console';
 
 dotenv.config();
 
@@ -16,13 +17,13 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const port = process.env.PORT || 5000;
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/Logs", {
-}).then(() => {
-  console.log("✅ Connected to MongoDB");
-}).catch(err => {
-  console.error("❌ MongoDB connection error:", err);
-});
+mongoose.connect("mongodb://localhost:27017/Logs")
+.then(()=>{
+  console.log("DB is connected")
+})
+.catch((error)=>{
+  console.log("DB is not connected",error)
+})
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
