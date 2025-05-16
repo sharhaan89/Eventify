@@ -1,4 +1,6 @@
 import Event from "../models/Event.js";
+import Venue from "../models/Venue.js";
+import User from "../models/User.js";
 
 export async function handleCreateEvent(req, res) {
   try {
@@ -54,8 +56,16 @@ export async function handleCreateEvent(req, res) {
 
 // Get all the events from the database using the Event model
 export async function handleGetAllEvents(req, res) {
-  const events = await Event.find().populate("venue").populate("createdBy");
-  res.status(200).json(events);
+  try {
+    const events = await Event.find()
+      .populate('venue')
+      .populate('createdBy');
+
+    res.status(200).json(events);
+  } catch (error) {
+    console.error("Error fetching events:", error);
+    res.status(500).json({ error: "Server error while fetching events." });
+  }
 }
 
 // Get a particular event using the id from the database
@@ -81,7 +91,7 @@ export async function handleUpdateEventById(req, res) {
     return res.status(404).json({ message: "Event not found" });
   }
 
-  if (event.createdBy.toString() !== req.user._id.toString()) {
+  if (event.createdBy.toString() !== req.user.id.toString()) {
     return res.status(403).json({ message: "You can only update your own events" });
   }
 
@@ -103,7 +113,7 @@ export async function handleDeleteEventById(req, res) {
     return res.status(404).json({ message: "Event not found" });
   }
 
-  if (event.createdBy.toString() !== req.user._id.toString()) {
+  if (event.createdBy.toString() !== req.user.id.toString()) {
     return res.status(403).json({ message: "You can only delete your own events" });
   }
 

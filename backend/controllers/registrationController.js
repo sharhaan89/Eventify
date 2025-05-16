@@ -2,12 +2,10 @@
 // Use the Registration Model created
 import mongoose from 'mongoose';
 import Registration from '../models/Registration.js';
-import User from '../models/User.js';
-import Event from '../models/Event.js';
 
 export async function handleRegisterEvent(req, res) {
-   const userID = req.user._id
-   const eventId = req.event._id
+   const userId = req.user.id
+   const eventId = req.params.id
     const newRegistration = await Registration.create({
       user: userId,
       event: eventId
@@ -18,25 +16,25 @@ export async function handleRegisterEvent(req, res) {
     res.status(500).json({ message: error.message })
 }
 
-
 // Get all the registrations for a particular event using the Registration model
 export async function handleGetAllRegistrations(req, res) {
-    const { eventId } = req.params;
+  const eventId = req.params.id;
 
-    // 1. Validate the event ID format
-    if (!mongoose.Types.ObjectId.isValid(eventId)) {
-      return res.status(400).json({ error: 'Invalid event ID format.' });
-    }
+  // 1. Validate the event ID format
+  if (!mongoose.Types.ObjectId.isValid(eventId)) {
+    return res.status(400).json({ error: 'Invalid event ID format.' });
+  }
 
+  try {
     // 2. Find all registrations linked to this event
-    const registrations = await Registration.find({ eventId });
+    const registrations = await Registration.find({ event: eventId });
 
     // 3. Return the list of registrations
-    res.status(200).json(registrations);
-  
+    return res.status(200).json(registrations);
+  } catch (error) {
     console.error('Error fetching registrations:', error);
-    res.status(500).json({ error: 'Server error while fetching registrations.' });
-  
+    return res.status(500).json({ error: 'Server error while fetching registrations.' });
+  }
 }
 
 //Generate a unique QR code using event ID + user ID
