@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import userRoutes from './routes/userRoutes.js';
 import eventRoutes from "./routes/eventRoutes.js";
 import registrationRoutes from "./routes/registrationRoutes.js";
+import { error } from 'console';
 
 dotenv.config();
 
@@ -15,7 +16,13 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const port = process.env.PORT || 5000;
 
-mongoose.connect("mongodb://localhost:27017/Logs");
+mongoose.connect("mongodb+srv://prem:password1234@cluster0.d6dyzbl.mongodb.net/trail5")
+.then(()=>{
+  console.log("DB is connected")
+})
+.catch((error)=>{
+  console.log("DB is not connected",error)
+})
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

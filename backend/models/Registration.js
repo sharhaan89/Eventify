@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const registrationSchema = new mongoose.Schema({
   user: {
@@ -19,4 +19,8 @@ const registrationSchema = new mongoose.Schema({
 
 registrationSchema.index({ user: 1, event: 1 }, { unique: true });
 
-module.exports = mongoose.model('Registration', registrationSchema);
+
+const Registration = mongoose.model('Registration', registrationSchema);
+
+
+export default Registration;
