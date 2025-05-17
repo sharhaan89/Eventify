@@ -8,7 +8,7 @@ export async function handleCreateEvent(req, res) {
       return res.status(403).json({ message: "Access denied: Managers only" });
     }
 
-    const { title, description, venue, fromTime, toTime, club, event } = req.body;
+    const { title, description, venue, fromTime, toTime,createdBy, club } = req.body;
 
     // Basic validation for required fields
     if (!title || !venue || !fromTime || !toTime || !club ) {
@@ -42,7 +42,6 @@ export async function handleCreateEvent(req, res) {
       toTime: to,
       createdBy: req.user.id,
       club,
-      event,
     });
 
     await newEvent.save();

@@ -30,11 +30,7 @@ const eventSchema = new mongoose.Schema({
   club: { 
     type: String, 
     required: true 
-  },
-  event: { 
-    type: String, 
-    required: true 
-  },
+  }
 }, { timestamps: true });
 
 const Event = mongoose.model("Event", eventSchema);

@@ -18,7 +18,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const port = process.env.PORT || 5000;
 
-mongoose.connect("mongodb://localhost:27017/Logs")
+mongoose.connect("mongodb+srv://prem:password1234@cluster0.d6dyzbl.mongodb.net/trail5")
 .then(()=>{
   console.log("DB is connected")
 })
