@@ -10,13 +10,15 @@ import registrationRoutes from "./routes/registrationRoutes.js";
 import cookieParser from "cookie-parser";
 import { error } from 'console';
 
-dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const port = process.env.PORT || 5000;
+
+//change to global database later
+//mongoose.connect("mongodb+srv://prem:password1234@cluster0.d6dyzbl.mongodb.net/trail5")
 
 mongoose.connect("mongodb+srv://prem:password1234@cluster0.d6dyzbl.mongodb.net/trail5")
 .then(()=>{
@@ -39,6 +41,8 @@ app.use(cookieParser());
 app.use('/users', userRoutes);
 app.use('/events', eventRoutes);
 app.use('/events', registrationRoutes);
+
+app.use('/', qrCodeRoute);
 
 /*
 // Serve static files

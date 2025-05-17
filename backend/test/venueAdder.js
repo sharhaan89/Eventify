@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import Venue from "./models/Venue.js";
+import Venue from "../models/Venue.js";
 
 async function addVenue() {
   try {

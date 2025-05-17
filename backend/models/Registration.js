@@ -14,6 +14,13 @@ const registrationSchema = new mongoose.Schema({
   registeredAt: {
     type: Date,
     default: Date.now
+  },
+  isCheckedIn: {
+    type: Boolean,
+    default: false
+  },
+  checkinTime: {
+    type: Date
   }
 }, { timestamps: true });
 

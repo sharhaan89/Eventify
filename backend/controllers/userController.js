@@ -41,7 +41,7 @@ export async function handleUserLogin(req, res) {
     if (!match) return res.status(400).json({error: "Incorrect password."});
 
     const token = jwt.sign(
-      { id: user._id, role: user.role },
+      { id: user._id, role: user.role, organization: user.organization },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
