@@ -3,12 +3,13 @@
 import QRCode from 'qrcode';
 import mongoose from 'mongoose';
 import Registration from '../models/Registration.js';
+import { sendRegistrationEmail } from '../test/mailer.js';
 
 const FRONTEND_URL = process.env.FRONTEND_URL;
 
 export async function handleRegisterEvent(req, res) {
   const userId = req.user.id;
-  const eventId = req.params.id;
+  const eventId = req.params.eventid;
 
   try {
     // Check if already registered
