@@ -2,7 +2,7 @@ import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-export async function getCurrentUser(req, res) {
+export async function handleGetCurrentUser(req, res) {
   try {
     const { id } = req.user;
 
@@ -75,8 +75,4 @@ export async function handleUserLogin(req, res) {
     console.error("Login error:", err);
     res.status(500).json({error: "Internal server error."});
   }
-}
-
-export async function handleGetUserRegistrations(req, res) {
-    
 }

@@ -119,5 +119,3 @@ export async function handleDeleteEventById(req, res) {
   await Event.findByIdAndDelete(id);
   res.status(200).json({ message: "Event deleted" });
 }
-
-//for the last two functions make sure that only the manager who created the event can perform those actions

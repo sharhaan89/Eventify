@@ -2,8 +2,12 @@
 // Use the Registration Model created
 import QRCode from 'qrcode';
 import mongoose from 'mongoose';
+import Event from '../models/Event.js';
 import Registration from '../models/Registration.js';
 import { sendRegistrationEmail } from '../test/mailer.js';
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const FRONTEND_URL = process.env.FRONTEND_URL;
 
@@ -18,17 +22,18 @@ export async function handleRegisterEvent(req, res) {
       return res.status(400).send('User already registered for this event.');
     }
 
+    const qrCodeBase64 = await handleGenerateQR(userId, eventId);
+
     // Register user
     const newRegistration = await Registration.create({
       user: userId,
       event: eventId,
+      qrCode: qrCodeBase64
     });
 
-    const qrCodeBase64 = await handleGenerateQR(userId, eventId);
 
     res.status(201).json({
       message: 'You have registered for the event.',
-      qrCodeBase64, 
     });
 
   } catch (error) {
@@ -87,9 +92,9 @@ export async function handleUserCheckIn(req, res) {
     const event = await Event.findOne({ _id: eventId});
     const currentUser = req.user;
 
-    if(event.club.toString() !== currentUser.organization.toString()) {
-        return res.status(403).json({message: "Access denied."});
-    }
+    //if(event.club.toString() !== currentUser.organization.toString()) {
+      //  return res.status(403).json({message: "Access denied."});
+    //}
 
     if(registration.isCheckedIn) {
       return res.status(409).json({message: "User already checked in."});
@@ -99,10 +104,49 @@ export async function handleUserCheckIn(req, res) {
     registration.checkinTime = new Date();
     await registration.save();
 
-    return res.status(200).json({ message: "User checked in successfully.", registration });
+    // Populate the registration with event and user details
+    const populatedRegistration = await Registration.findById(registration._id)
+      .populate('event')
+      .populate('user', 'username email'); // Only include necessary user fields
+
+    return res.status(200).json({ 
+      message: "User checked in successfully.", 
+      registration: populatedRegistration 
+    });
 
   } catch (error) {
     console.error("Error checking in user:", error);
     return res.status(500).json({ error: "Server error while checking in user." });
+  }
+}
+
+export async function handleGetUserRegisteredEvents(req, res) {
+  const userId = req.user.id;
+
+  try {
+    const registrations = await Registration.find({ user: userId })
+      .populate('event') // populate event data
+      .sort({ createdAt: -1 }); // optional: sort by registration date, latest first
+
+    if (!registrations || registrations.length === 0) {
+      return res.status(404).json({ message: "No registered events found." });
+    }
+
+    const result = registrations.map(reg => ({
+      registration: {
+        _id: reg._id,
+        registeredAt: reg.registeredAt,
+        isCheckedIn: reg.isCheckedIn,
+        checkinTime: reg.checkinTime,
+        qrCode: reg.qrCode
+      },
+      event: reg.event
+    }));
+
+    return res.status(200).json(result);
+
+  } catch (error) {
+    console.error("Error fetching user registrations:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 }

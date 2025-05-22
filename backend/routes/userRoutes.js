@@ -1,9 +1,10 @@
 import express from "express";
 import { verifyToken } from "../middlewares/authMiddleware.js";
-import { handleUserLogin, handleUserSignup } from "../controllers/userController.js";
+import { handleGetCurrentUser, handleUserLogin, handleUserSignup } from "../controllers/userController.js";
 
 const router = express.Router();
 
+router.get("/current", handleGetCurrentUser);
 router.post("/login", handleUserLogin);
 router.post("/signup", handleUserSignup);
 

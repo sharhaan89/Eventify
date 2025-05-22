@@ -15,6 +15,9 @@ const registrationSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
+  qrCode: {
+    type: String
+  },
   isCheckedIn: {
     type: Boolean,
     default: false
