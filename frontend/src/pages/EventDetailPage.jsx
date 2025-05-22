@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useParams, Link } from "react-router-dom"
-import { MapPin, Clock, Calendar, Users, ArrowLeft, Share2, Heart } from 'lucide-react'
+import { MapPin, Clock, Calendar, Users, ArrowLeft, Share2, Heart, CheckCircle, AlertCircle } from 'lucide-react'
 import Navbar from "../components/Navbar.jsx"
 import fakeEvents from "../tempdata.js"
 
@@ -11,6 +11,9 @@ export default function EventDetails() {
   const { id } = useParams()
   const [event, setEvent] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [registering, setRegistering] = useState(false)
+  const [registrationMessage, setRegistrationMessage] = useState(null)
+  const [registrationError, setRegistrationError] = useState(null)
 
     useEffect(() => {
     const fetchEvent = async () => {
@@ -43,6 +46,45 @@ export default function EventDetails() {
     setLoading(false)
   }, [id])
 */
+
+  const handleRegister = async () => {
+    setRegistering(true)
+    setRegistrationMessage(null)
+    setRegistrationError(null)
+
+    try {
+      const res = await fetch(`${API_URL}/events/${id}/registrations`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Failed to register for event');
+      }
+
+      const data = await res.json();
+      setRegistrationMessage('Successfully registered for the event!');
+      
+      // Hide the success message after 5 seconds
+      setTimeout(() => {
+        setRegistrationMessage(null);
+      }, 5000);
+
+    } catch (err) {
+      setRegistrationError(err.message);
+      
+      // Hide the error message after 5 seconds
+      setTimeout(() => {
+        setRegistrationError(null);
+      }, 5000);
+    } finally {
+      setRegistering(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -135,6 +177,21 @@ export default function EventDetails() {
               </div>
             </div>
 
+            {/* Registration Messages */}
+            {registrationMessage && (
+              <div className="mb-6 p-4 bg-green-900 border border-green-700 rounded-lg flex items-center">
+                <CheckCircle className="h-5 w-5 text-green-400 mr-3" />
+                <p className="text-green-100">{registrationMessage}</p>
+              </div>
+            )}
+
+            {registrationError && (
+              <div className="mb-6 p-4 bg-red-900 border border-red-700 rounded-lg flex items-center">
+                <AlertCircle className="h-5 w-5 text-red-400 mr-3" />
+                <p className="text-red-100">{registrationError}</p>
+              </div>
+            )}
+
             {/* Event Details */}
             <div className="grid grid-cols-1 gap-8">
               <div className="md:col-span-2 space-y-6">
@@ -186,8 +243,19 @@ export default function EventDetails() {
                   </div>
                 </div>
                  <div className="mt-6">
-                    <button className="w-full bg-rose-600 hover:bg-rose-700 text-white py-2 px-4 rounded-md transition-colors">
-                      Register for Event
+                    <button 
+                      onClick={handleRegister}
+                      disabled={registering}
+                      className="w-full bg-rose-600 hover:bg-rose-700 disabled:bg-rose-400 disabled:cursor-not-allowed text-white py-2 px-4 rounded-md transition-colors flex items-center justify-center"
+                    >
+                      {registering ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                          Registering...
+                        </>
+                      ) : (
+                        'Register for Event'
+                      )}
                     </button>
                 </div>
               </div>

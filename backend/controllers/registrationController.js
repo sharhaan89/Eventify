@@ -9,7 +9,7 @@ const FRONTEND_URL = process.env.FRONTEND_URL;
 
 export async function handleRegisterEvent(req, res) {
   const userId = req.user.id;
-  const eventId = req.params.eventid;
+  const eventId = req.params.id;
 
   try {
     // Check if already registered

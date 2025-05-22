@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { Eye, EyeOff, UserPlus, Check } from "lucide-react"
+import { NavLink, useNavigate } from 'react-router-dom'
 
 // Array of background images
 const backgroundImages = [
@@ -15,12 +16,18 @@ export default function SignupPage() {
     email: "",
     password: "",
     confirmPassword: "",
-    role: "student",
+    role: "Student",
   })
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [currentBgIndex, setCurrentBgIndex] = useState(0)
   const [passwordMatch, setPasswordMatch] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+
+  const navigate = useNavigate()
+  const API_URL = import.meta.env.VITE_API_URL
 
   // Change background image every 2.5 seconds
   useEffect(() => {
@@ -48,11 +55,80 @@ export default function SignupPage() {
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords don't match!")
+    setError('')
+    setSuccess('')
+    setIsLoading(true)
+
+    // Form validation
+    if (!formData.username.trim() || !formData.email.trim() || !formData.password.trim() || !formData.confirmPassword.trim()) {
+      setError('Please fill in all fields')
+      setIsLoading(false)
       return
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(formData.email.trim())) {
+      setError('Please enter a valid email address')
+      setIsLoading(false)
+      return
+    }
+
+    // Password validation
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long')
+      setIsLoading(false)
+      return
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords don't match!")
+      setIsLoading(false)
+      return
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/users/signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // This ensures cookies are sent and received
+        body: JSON.stringify({
+          username: formData.username.trim(),
+          email: formData.email.trim(),
+          password: formData.password,
+          role: formData.role
+        })
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        // Signup successful
+        console.log('Signup successful:', data)
+        setSuccess('Account created successfully! Redirecting to login...')
+        
+        // You can store user data in localStorage/sessionStorage if needed
+        if (data.user) {
+          localStorage.setItem('user', JSON.stringify(data.user))
+        }
+        
+        // Redirect to login page after a short delay
+        setTimeout(() => {
+          navigate('/users/login')
+        }, 1500)
+      } else {
+        // Signup failed
+        setError(data.message || 'Signup failed. Please try again.')
+      }
+    } catch (err) {
+      console.error('Signup error:', err)
+      setError('Network error. Please try again.')
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -77,7 +153,19 @@ export default function SignupPage() {
             <h2 className="text-3xl font-bold text-center text-white mb-2">Create Account</h2>
             <p className="text-zinc-400 text-center mb-8">Join Eventify today</p>
 
-            <form action="/users/signup" onSubmit={handleSubmit} method="POST" className="space-y-5">
+            {error && (
+              <div className="mb-6 p-4 bg-red-900 border border-red-700 rounded-lg">
+                <p className="text-red-300 text-sm">{error}</p>
+              </div>
+            )}
+
+            {success && (
+              <div className="mb-6 p-4 bg-green-900 border border-green-700 rounded-lg">
+                <p className="text-green-300 text-sm">{success}</p>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label htmlFor="username" className="block text-sm font-medium text-zinc-300 mb-2">
                   Username
@@ -91,6 +179,7 @@ export default function SignupPage() {
                   className="w-full px-4 py-3 rounded-lg bg-zinc-700 border border-zinc-600 text-white focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
                   placeholder="Choose a username"
                   required
+                  disabled={isLoading}
                 />
               </div>
 
@@ -107,6 +196,7 @@ export default function SignupPage() {
                   className="w-full px-4 py-3 rounded-lg bg-zinc-700 border border-zinc-600 text-white focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
                   placeholder="your.email@example.com"
                   required
+                  disabled={isLoading}
                 />
               </div>
 
@@ -124,11 +214,13 @@ export default function SignupPage() {
                     className="w-full px-4 py-3 rounded-lg bg-zinc-700 border border-zinc-600 text-white focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
                     placeholder="Create a password"
                     required
+                    disabled={isLoading}
                   />
                   <button
                     type="button"
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-zinc-400 hover:text-white"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-zinc-400 hover:text-white disabled:cursor-not-allowed"
                     onClick={() => setShowPassword(!showPassword)}
+                    disabled={isLoading}
                   >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
@@ -153,11 +245,13 @@ export default function SignupPage() {
                     } focus:border-transparent`}
                     placeholder="Confirm your password"
                     required
+                    disabled={isLoading}
                   />
                   <button
                     type="button"
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-zinc-400 hover:text-white"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-zinc-400 hover:text-white disabled:cursor-not-allowed"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    disabled={isLoading}
                   >
                     {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
@@ -172,28 +266,28 @@ export default function SignupPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div
                     className={`flex items-center justify-center p-3 rounded-lg cursor-pointer border ${
-                      formData.role === "student"
+                      formData.role === "Student"
                         ? "bg-rose-900/50 border-rose-500"
                         : "bg-zinc-700 border-zinc-600 hover:bg-zinc-600"
-                    }`}
-                    onClick={() => setFormData((prev) => ({ ...prev, role: "student" }))}
+                    } ${isLoading ? 'cursor-not-allowed opacity-50' : ''}`}
+                    onClick={() => !isLoading && setFormData((prev) => ({ ...prev, role: "Student" }))}
                   >
                     <div className="flex items-center">
-                      {formData.role === "student" && <Check size={18} className="text-rose-400 mr-2" />}
+                      {formData.role === "Student" && <Check size={18} className="text-rose-400 mr-2" />}
                       <span className="font-medium text-white">Student</span>
                     </div>
                   </div>
 
                   <div
                     className={`flex items-center justify-center p-3 rounded-lg cursor-pointer border ${
-                      formData.role === "manager"
+                      formData.role === "Manager"
                         ? "bg-rose-900/50 border-rose-500"
                         : "bg-zinc-700 border-zinc-600 hover:bg-zinc-600"
-                    }`}
-                    onClick={() => setFormData((prev) => ({ ...prev, role: "manager" }))}
+                    } ${isLoading ? 'cursor-not-allowed opacity-50' : ''}`}
+                    onClick={() => !isLoading && setFormData((prev) => ({ ...prev, role: "Manager" }))}
                   >
                     <div className="flex items-center">
-                      {formData.role === "manager" && <Check size={18} className="text-rose-400 mr-2" />}
+                      {formData.role === "Manager" && <Check size={18} className="text-rose-400 mr-2" />}
                       <span className="font-medium text-white">Manager</span>
                     </div>
                   </div>
@@ -202,11 +296,20 @@ export default function SignupPage() {
 
               <button
                 type="submit"
-                className="w-full bg-rose-600 hover:bg-rose-700 text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center transition duration-300 ease-in-out mt-6"
-                disabled={!passwordMatch}
+                className="w-full bg-rose-600 hover:bg-rose-700 disabled:bg-rose-800 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center transition duration-300 ease-in-out mt-6"
+                disabled={!passwordMatch || isLoading}
               >
-                <UserPlus size={20} className="mr-2" />
-                Create Account
+                {isLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                    Creating Account...
+                  </>
+                ) : (
+                  <>
+                    <UserPlus size={20} className="mr-2" />
+                    Create Account
+                  </>
+                )}
               </button>
             </form>
           </div>
@@ -214,9 +317,9 @@ export default function SignupPage() {
           <div className="py-4 bg-zinc-900 text-center">
             <p className="text-zinc-400">
               Already have an account?{" "}
-              <a href="/users/login" className="text-rose-400 hover:text-rose-300 font-medium">
+              <NavLink to="/users/login" className="text-rose-400 hover:text-rose-300 font-medium">
                 Login
-              </a>
+              </NavLink>
             </p>
           </div>
         </div>
@@ -224,5 +327,3 @@ export default function SignupPage() {
     </div>
   )
 }
-
-
