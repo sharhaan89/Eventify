@@ -20,7 +20,7 @@ export default function EventCard({ event }) {
   }
 
   // Check if the event spans multiple days
-  const isMultiDayEvent = formatDate(event.fromTime) !== formatDate(event.endTime)
+  const isMultiDayEvent = formatDate(event.fromTime) !== formatDate(event.toTime)
 
   return (
     <div className="bg-zinc-800 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 border border-zinc-700">
@@ -34,7 +34,7 @@ export default function EventCard({ event }) {
         <div className="text-sm text-zinc-300 mb-3 space-y-2">
           <p className="flex items-center">
             <MapPin className="h-4 w-4 mr-1 text-zinc-400" />
-            <span className="line-clamp-1">{event.venue}</span>
+            <span className="line-clamp-1">{event.venue.venueName}</span>
           </p>
 
           <p className="flex items-start">
@@ -42,7 +42,7 @@ export default function EventCard({ event }) {
             <span>
               {isMultiDayEvent ? (
                 <span>
-                  {formatDate(event.fromTime)} - {formatDate(event.endTime)}
+                  {formatDate(event.fromTime)} - {formatDate(event.toTime)}
                 </span>
               ) : (
                 <span>{formatDate(event.fromTime)}</span>
@@ -53,7 +53,7 @@ export default function EventCard({ event }) {
           <p className="flex items-center">
             <Clock className="h-4 w-4 mr-1 text-zinc-400" />
             <span>
-              {formatTime(event.fromTime)} - {formatTime(event.endTime)}
+              {formatTime(event.fromTime)} - {formatTime(event.toTime)}
             </span>
           </p>
         </div>

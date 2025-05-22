@@ -1,7 +1,23 @@
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
-
 import jwt from "jsonwebtoken";
+
+export async function getCurrentUser(req, res) {
+  try {
+    const { id } = req.user;
+
+    const user = await User.findById(id).select('-password'); // exclude password
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Error fetching current user:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+}
 
 export async function handleUserSignup(req, res) {
     const { username, email, password, organization, role } = req.body;

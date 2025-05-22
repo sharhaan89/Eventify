@@ -1,7 +1,6 @@
-import React from "react"
 import { useEffect } from "react"
 import axios from "axios"
-import NavBar from "../components/NavBar"
+import NavBar from "../components/Navbar.jsx"
 import EventCard from "../components/EventCard"
 import { useState } from "react"
 
@@ -13,15 +12,33 @@ import fakeEvents from "../tempdata.js"
 
 export default function EventListPage() {
 
-        const events = fakeEvents
+  const API_URL = import.meta.env.VITE_API_URL;
 
+  //const events = fakeEvents
+  const [events, setEvents] = useState([])
+  const [loading, setLoading] = useState(true)
   const [startDateTime, setStartDateTime] = useState(null)
   const [endDateTime, setEndDateTime] = useState(null)
   const [selectedLocations, setSelectedLocations] = useState([])
   const [selectedClubs, setSelectedClubs] = useState([])
 
+    useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/events`);
+        setEvents(res.data);
+      } catch (err) {
+        console.error('Error fetching events:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
   // Get unique locations and clubs for the filter
-  const locations = [...new Set(events.map((event) => event.venue))]
+  const locations = [...new Set(events.map((event) => event.venue.venueName))]
   const clubs = [...new Set(events.map((event)=> event.club))]
 
   // Filter events based on date range and locations
@@ -29,10 +46,10 @@ export default function EventListPage() {
     // Date filtering
     const dateFilter =
       (!startDateTime || new Date(event.fromTime) >= startDateTime) &&
-      (!endDateTime || new Date(event.endTime) <= endDateTime)
+      (!endDateTime || new Date(event.toTime) <= endDateTime)
 
     // Location filtering
-    const locationFilter = selectedLocations.length === 0 || selectedLocations.includes(event.venue)
+    const locationFilter = selectedLocations.length === 0 || selectedLocations.includes(event.venue.venueName)
 
     // Club filtering
     const clubFilter = selectedClubs.length === 0 || selectedClubs.includes(event.club)

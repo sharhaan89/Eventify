@@ -1,22 +1,48 @@
 import { useState, useEffect } from "react"
 import { useParams, Link } from "react-router-dom"
 import { MapPin, Clock, Calendar, Users, ArrowLeft, Share2, Heart } from 'lucide-react'
-import Navbar from "../components/Navbar"
+import Navbar from "../components/Navbar.jsx"
 import fakeEvents from "../tempdata.js"
 
 export default function EventDetails() {
 
+  const API_URL = import.meta.env.VITE_API_URL;
   const events = fakeEvents
   const { id } = useParams()
   const [event, setEvent] = useState(null)
   const [loading, setLoading] = useState(true)
 
+    useEffect(() => {
+    const fetchEvent = async () => {
+      try {
+        const res = await fetch(`${API_URL}/events/${id}`, {
+          credentials: "include", // if your backend requires auth cookies
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch event");
+        }
+
+        const data = await res.json();
+        setEvent(data);
+      } catch (err) {
+        //setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvent();
+  }, [id]);
+
+  /*
   useEffect(() => {
     // Find the event with the matching id
     const foundEvent = events.find((e) => e._id === parseInt(id))
     setEvent(foundEvent)
     setLoading(false)
   }, [id])
+*/
 
   if (loading) {
     return (
@@ -123,12 +149,12 @@ export default function EventDetails() {
                           <>
                             <span className="block">{formatDate(event.fromTime)} at {formatTime(event.fromTime)}</span>
                             <span className="block">to</span>
-                            <span className="block">{formatDate(event.endTime)} at {formatTime(event.endTime)}</span>
+                            <span className="block">{formatDate(event.toTime)} at {formatTime(event.toTime)}</span>
                           </>
                         ) : (
                           <>
                             <span className="block">{formatDate(event.fromTime)}</span>
-                            <span className="block">{formatTime(event.fromTime)} - {formatTime(event.endTime)}</span>
+                            <span className="block">{formatTime(event.fromTime)} - {formatTime(event.toTime)}</span>
                           </>
                         )}
                       </p>
@@ -139,7 +165,7 @@ export default function EventDetails() {
                     <MapPin className="h-5 w-5 mr-3 text-rose-400 mt-0.5" />
                     <div>
                       <h3 className="font-medium text-white">Location</h3>
-                      <p className="text-zinc-300">{event.venue}</p>
+                      <p className="text-zinc-300">{event.venue.venueName}</p>
                     </div>
                   </div>
 

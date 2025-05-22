@@ -10,6 +10,7 @@ import registrationRoutes from "./routes/registrationRoutes.js";
 import cookieParser from "cookie-parser";
 import { error } from 'console';
 
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,8 +20,9 @@ const port = process.env.PORT || 5000;
 
 //change to global database later
 //mongoose.connect("mongodb+srv://prem:password1234@cluster0.d6dyzbl.mongodb.net/trail5")
+//mongodb://127.0.0.1:27017
 
-mongoose.connect("mongodb+srv://prem:password1234@cluster0.d6dyzbl.mongodb.net/trail5")
+mongoose.connect("mongodb://127.0.0.1:27017/Logs")
 .then(()=>{
   console.log("DB is connected")
 })
@@ -32,8 +34,8 @@ mongoose.connect("mongodb+srv://prem:password1234@cluster0.d6dyzbl.mongodb.net/t
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors({
-  origin: process.env.FRONTEND_URL, // 👈 explicitly allow your frontend origin
-  credentials: true               // 👈 allow cookies and headers
+  origin: "http://localhost:5173",  // 👈 exact frontend origin
+  credentials: true
 }));
 app.use(cookieParser());
 
@@ -42,7 +44,7 @@ app.use('/users', userRoutes);
 app.use('/events', eventRoutes);
 app.use('/events', registrationRoutes);
 
-app.use('/', qrCodeRoute);
+//app.use('/', qrCodeRoute);
 
 /*
 // Serve static files
