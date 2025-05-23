@@ -6,6 +6,7 @@ import SignupPage from './pages/SignupPage'
 import EventsListPage from './pages/EventsListPage'
 import EventDetailPage from './pages/EventDetailPage'
 import EventCreatePage from './pages/EventCreatePage'
+import EventEditPage from './pages/EventEditPage'
 import RegisteredEventsPage from './pages/RegisteredEventsPage'
 import DashboardPage from './pages/EventsManagerDashboardPage'
 import CheckinPage from './pages/EventCheckinPage'
@@ -25,6 +26,7 @@ function App() {
         <Route path="/events/all" element={<EventsListPage />} />
         <Route path="/events/:id" element={<EventDetailPage />} />
         <Route path="/events/create" element={<EventCreatePage />} />
+        <Route path="/events/:id/edit" element={<EventEditPage />} />
         <Route path="/events/registered" element={<RegisteredEventsPage />} />
         <Route path="/events/dashboard" element={<DashboardPage />} />
 
