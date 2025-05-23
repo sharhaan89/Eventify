@@ -96,26 +96,37 @@ export async function handleGetEventById(req, res) {
   res.status(200).json(event);
 }
 
-// Update the details an event using the ID
 export async function handleUpdateEventById(req, res) {
   if (req.user.role !== "Manager") {
     return res.status(403).json({ message: "Access denied: Managers only" });
   }
-  
+
   const { id } = req.params;
-  const event = await Event.findById(id);
 
-  if (!event) {
-    return res.status(404).json({ message: "Event not found" });
+  // ✅ Validate the ID
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid event ID" });
   }
 
-  if (event.createdBy.toString() !== req.user.id.toString()) {
-    return res.status(403).json({ message: "You can only update your own events" });
-  }
+  try {
+    const event = await Event.findById(id);
 
-  Object.assign(event, req.body);
-  await event.save();
-  res.status(200).json({ message: "Event updated", event });
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    if (event.createdBy.toString() !== req.user.id.toString()) {
+      return res.status(403).json({ message: "You can only update your own events" });
+    }
+
+    Object.assign(event, req.body);
+    await event.save();
+
+    res.status(200).json({ message: "Event updated", event });
+  } catch (error) {
+    console.error("Error updating event:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 }
 
 // Delete an event by ID
