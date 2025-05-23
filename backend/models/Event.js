@@ -9,6 +9,10 @@ const eventSchema = new mongoose.Schema({
   description: {
     type: String
   },
+  banner: {
+    data: Buffer,
+    contentType: String
+  },
   venue: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Venue",

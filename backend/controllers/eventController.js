@@ -8,10 +8,15 @@ export async function handleCreateEvent(req, res) {
       return res.status(403).json({ message: "Access denied: Managers only" });
     }
 
-    const { title, description, venue, fromTime, toTime,createdBy, club } = req.body;
+    const { title, description, venue, fromTime, toTime, club } = req.body;
 
     // Basic validation for required fields
     if (!title || !venue || !fromTime || !toTime || !club ) {
+        console.log(title);
+        console.log(venue);
+        console.log(fromTime);
+        console.log(toTime);
+        console.log(club);
       return res.status(400).json({ message: "Missing required fields" });
     }
 
@@ -67,6 +72,20 @@ export async function handleGetAllEvents(req, res) {
   }
 }
 
+export async function handleGetCreatedEvents(req, res) {
+  try {
+    const userId = req.user.id;
+
+    const events = await Event.find({ createdBy: userId })
+      .populate('venue', 'venueName'); // Populate only venueName from Venue
+
+    res.status(200).json(events);
+  } catch (error) {
+    console.error("Error fetching created events:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 // Get a particular event using the id from the database
 export async function handleGetEventById(req, res) {
   const { id } = req.params;
@@ -118,4 +137,14 @@ export async function handleDeleteEventById(req, res) {
 
   await Event.findByIdAndDelete(id);
   res.status(200).json({ message: "Event deleted" });
+}
+
+export async function handleGetVenues(req, res) {
+  try {
+    const venues = await Venue.find({}, '_id venueName capacity'); 
+    res.status(200).json(venues);
+  } catch (error) {
+    console.error("Error fetching venues:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 }

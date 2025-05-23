@@ -7,7 +7,7 @@ import EventsListPage from './pages/EventsListPage'
 import EventDetailPage from './pages/EventDetailPage'
 import EventCreatePage from './pages/EventCreatePage'
 import RegisteredEventsPage from './pages/RegisteredEventsPage'
-import DashboardPage from './pages/DashboardPage'
+import DashboardPage from './pages/EventsManagerDashboardPage'
 import CheckinPage from './pages/EventCheckinPage'
 import ErrorPage from './pages/ErrorPage'
 
