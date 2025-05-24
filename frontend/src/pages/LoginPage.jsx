@@ -76,7 +76,7 @@ export default function LoginPage() {
         }
         
         // Redirect to dashboard or home page
-        navigate('/dashboard') // Change this to your desired route
+        navigate('/events/dashboard') // Change this to your desired route
       } else {
         // Login failed
         setError(data.message || 'Login failed. Please check your credentials.')

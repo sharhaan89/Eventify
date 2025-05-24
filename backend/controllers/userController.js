@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 
 export async function handleGetCurrentUser(req, res) {
   try {
-    const { id } = req.user;
+    const id = req.user.id;
 
     const user = await User.findById(id).select('-password'); // exclude password
 
@@ -74,5 +74,20 @@ export async function handleUserLogin(req, res) {
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({error: "Internal server error."});
+  }
+}
+
+export async function handleUserLogout(req, res) {
+  try {
+    res.clearCookie('token', {
+      httpOnly: true,
+      sameSite: 'Lax',
+      //secure: process.env.NODE_ENV === 'production',
+    });
+
+    return res.status(200).json({ message: 'Logged out successfully' });
+  } catch (error) {
+    console.error('Logout Error:', error);
+    return res.status(500).json({ message: 'Logout failed' });
   }
 }

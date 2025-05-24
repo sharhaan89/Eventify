@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
-import Navbar from './components/Navbar'
+import NavBar from './components/NavBar'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
@@ -15,7 +15,7 @@ import ErrorPage from './pages/ErrorPage'
 function App() {
   return (
     <>
-      <Navbar />
+      <NavBar />
       <div style={{ padding: '1rem', marginTop: '3rem' }}/> 
       <Routes>
         <Route path="/" element={<HomePage />} />
@@ -31,7 +31,7 @@ function App() {
         <Route path="/events/dashboard" element={<DashboardPage />} />
 
         <Route path="/checkin/:eventId/:userId" element={<CheckinPage />} />
-        <Route path="*" element={<ErrorPage />} />
+        <Route path="*" element={<HomePage />} />
       </Routes>
     </>
   )

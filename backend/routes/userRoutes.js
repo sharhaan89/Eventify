@@ -1,11 +1,12 @@
 import express from "express";
 import { verifyToken } from "../middlewares/authMiddleware.js";
-import { handleGetCurrentUser, handleUserLogin, handleUserSignup } from "../controllers/userController.js";
+import { handleGetCurrentUser, handleUserLogin, handleUserLogout, handleUserSignup } from "../controllers/userController.js";
 
 const router = express.Router();
 
-router.get("/current", handleGetCurrentUser);
+router.get("/current", verifyToken, handleGetCurrentUser);
 router.post("/login", handleUserLogin);
+router.post("/logout", verifyToken, handleUserLogout);
 router.post("/signup", handleUserSignup);
 
 // Both Manager and Student can access this router
