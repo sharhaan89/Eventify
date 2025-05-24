@@ -16,12 +16,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = 3000;
 
 //change to global database later
-//mongoose.connect("mongodb+srv://prem:password1234@cluster0.d6dyzbl.mongodb.net/trail5")
-//mongodb://127.0.0.1:27017
-
 mongoose.connect("mongodb://127.0.0.1:27017/Logs")
 .then(()=>{
   console.log("DB is connected")

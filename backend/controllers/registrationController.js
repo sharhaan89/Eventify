@@ -30,6 +30,12 @@ export async function handleRegisterEvent(req, res) {
       event: eventId,
       qrCode: qrCodeBase64
     });
+     
+
+    const user = await User.findById(userId);
+    const event = await Event.findById(eventId);
+     await sendRegistrationEmailWithQR(user.email, event.title, qrCodeBase64);
+
 
 
     res.status(201).json({

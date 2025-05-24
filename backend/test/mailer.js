@@ -1,4 +1,6 @@
 import nodemailer from 'nodemailer';
+import dotenv from "dotenv";
+dotenv.config()
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -8,12 +10,12 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-export const sendRegistrationEmail = async (to, eventName) => {
+export const sendRegistrationEmail = async (to, eventName,qrCodeBase64) => {
   const mailOptions = {
     from: `"Eventify" <${process.env.EMAIL_USER}>`,
     to: to,
     subject: `Registration Confirmed: ${eventName}`,
-    html: `<h2>You're registered!</h2><p>Thank you for registering for <strong>${eventName}</strong>.</p>`
+    html: `<h2>You're registered!</h2><p>Thank you for registering for <strong>${eventName}</strong>.</p> <img src="${qrCodeBase64}" alt="QR Code" />`
   };
 
   await transporter.sendMail(mailOptions);
