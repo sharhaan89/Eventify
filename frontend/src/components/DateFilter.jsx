@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react"
-import { Calendar, X, Clock } from "lucide-react"
+import { Calendar, Clock, X, ChevronLeft, ChevronRight } from "lucide-react"
 
 export default function DateFilter({ startDateTime, endDateTime, onStartDateTimeChange, onEndDateTimeChange }) {
   const [startOpen, setStartOpen] = useState(false)
@@ -21,18 +21,6 @@ export default function DateFilter({ startDateTime, endDateTime, onStartDateTime
     setEndTime("23:59")
     onStartDateTimeChange(null)
     onEndDateTimeChange(null)
-  }
-
-  const formatDateTime = (date) => {
-    if (!date) return ""
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    })
   }
 
   const handleStartDateSelect = (date) => {
@@ -134,13 +122,19 @@ export default function DateFilter({ startDateTime, endDateTime, onStartDateTime
           date.getDate() === selectedDate.getDate() && 
           date.getMonth() === selectedDate.getMonth() && 
           date.getFullYear() === selectedDate.getFullYear()
+        const isToday = date.toDateString() === today.toDateString()
         
         days.push(
           <button
             key={i}
             onClick={() => onSelectDate(date)}
-            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm
-              ${isSelected ? 'bg-blue-600 text-white' : 'hover:bg-zinc-700 text-zinc-200'}`}
+            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm transition-colors
+              ${isSelected 
+                ? 'bg-red-600 text-white' 
+                : isToday
+                  ? 'bg-red-900/30 text-red-400 border border-red-600'
+                  : 'hover:bg-gray-700 text-gray-200'
+              }`}
           >
             {i}
           </button>
@@ -172,27 +166,27 @@ export default function DateFilter({ startDateTime, endDateTime, onStartDateTime
                          "July", "August", "September", "October", "November", "December"]
     
     return (
-      <div ref={calendarRef} className="text-sm bg-zinc-800 border border-zinc-700 rounded-md shadow-lg p-3 w-64">
+      <div ref={calendarRef} className="bg-gray-900 border border-gray-800 rounded-lg shadow-xl p-4 w-72">
         <div className="flex justify-between items-center mb-4">
           <button 
             onClick={goToPreviousMonth}
-            className="text-zinc-400 hover:text-white p-1"
+            className="p-1 text-gray-400 hover:text-white hover:bg-gray-800 rounded transition-colors"
           >
-            &lt;
+            <ChevronLeft className="w-4 h-4" />
           </button>
-          <div className="text-zinc-200 font-medium">
+          <div className="text-white font-semibold">
             {monthNames[currentMonth]} {currentYear}
           </div>
           <button 
             onClick={goToNextMonth}
-            className="text-zinc-400 hover:text-white p-1"
+            className="p-1 text-gray-400 hover:text-white hover:bg-gray-800 rounded transition-colors"
           >
-            &gt;
+            <ChevronRight className="w-4 h-4" />
           </button>
         </div>
         <div className="grid grid-cols-7 gap-1 mb-2">
           {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map(day => (
-            <div key={day} className="w-8 h-8 flex items-center justify-center text-xs text-zinc-400">
+            <div key={day} className="w-8 h-8 flex items-center justify-center text-xs text-gray-400 font-medium">
               {day}
             </div>
           ))}
@@ -205,90 +199,101 @@ export default function DateFilter({ startDateTime, endDateTime, onStartDateTime
   }
 
   return (
-    <div className="col-span-4 bg-zinc-800 p-4 rounded-lg shadow-md border border-zinc-700">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <h2 className="text-sm font-medium text-white">Filter Events by Date & Time</h2>
+    <div className="w-full space-y-4">
+      {/* Start Date/Time */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-gray-300">Start Date & Time</label>
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <button
+              ref={startButtonRef}
+              onClick={() => setStartOpen(!startOpen)}
+              className="w-full flex items-center gap-2 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white hover:border-red-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+            >
+              <Calendar className="w-4 h-4 text-red-500" />
+              <span className="text-sm">
+                {startDate ? startDate.toLocaleDateString() : "Select date"}
+              </span>
+            </button>
+            
+            {startOpen && (
+              <div className="absolute z-20 mt-2">
+                <SimpleCalendar 
+                  selectedDate={startDate}
+                  onSelectDate={handleStartDateSelect}
+                  calendarRef={startCalendarRef}
+                />
+              </div>
+            )}
+          </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="space-y-2">
-            <div className="relative">
-              <button
-                ref={startButtonRef}
-                onClick={() => setStartOpen(!startOpen)}
-                className="text-xs flex items-center gap-2 h-10 px-3 py-2 rounded-md bg-rose-700 border border-zinc-600 text-zinc-200 hover:bg-rose-600"
-              >
-                <Calendar className="h-4 w-4" />
-                {startDate ? startDate.toLocaleDateString() : "Start Date"}
-              </button>
-              
-              {startOpen && (
-                <div className="absolute z-10 mt-1">
-                  <SimpleCalendar 
-                    selectedDate={startDate}
-                    onSelectDate={handleStartDateSelect}
-                    calendarRef={startCalendarRef}
-                  />
-                </div>
-              )}
-            </div>
-
-            <div className="flex items-center gap-2">
+          <div className="relative">
+            <div className="flex items-center">
+              <Clock className="absolute left-3 w-4 h-4 text-red-500 z-10" />
               <input
                 type="time"
                 value={startTime}
                 onChange={handleStartTimeChange}
-                className="text-xs h-8 w-25 px-2 py-1 rounded-md bg-rose-700 border border-zinc-600 text-zinc-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 disabled={!startDate}
+                className="pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
               />
             </div>
           </div>
+        </div>
+      </div>
 
-          <span className="text-zinc-400">to</span>
+      {/* End Date/Time */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-gray-300">End Date & Time</label>
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <button
+              ref={endButtonRef}
+              onClick={() => setEndOpen(!endOpen)}
+              className="w-full flex items-center gap-2 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white hover:border-red-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+            >
+              <Calendar className="w-4 h-4 text-red-500" />
+              <span className="text-sm">
+                {endDate ? endDate.toLocaleDateString() : "Select date"}
+              </span>
+            </button>
+            
+            {endOpen && (
+              <div className="absolute z-20 mt-2">
+                <SimpleCalendar 
+                  selectedDate={endDate}
+                  onSelectDate={handleEndDateSelect}
+                  calendarRef={endCalendarRef}
+                />
+              </div>
+            )}
+          </div>
 
-          <div className="space-y-2">
-            <div className="relative">
-              <button
-                ref={endButtonRef}
-                onClick={() => setEndOpen(!endOpen)}
-                className="flex text-xs items-center gap-2 h-10 px-3 py-2 rounded-md bg-rose-700 border border-zinc-600 text-zinc-200 hover:bg-rose-600"
-              >
-                <Calendar className="text-xs h-4 w-4" />
-                {endDate ? endDate.toLocaleDateString() : "End Date"}
-              </button>
-              
-              {endOpen && (
-                <div className="absolute z-10 mt-1">
-                  <SimpleCalendar 
-                    selectedDate={endDate}
-                    onSelectDate={handleEndDateSelect}
-                    calendarRef={endCalendarRef}
-                  />
-                </div>
-              )}
-            </div>
-
-            <div className="flex items-center gap-2">
+          <div className="relative">
+            <div className="flex items-center">
+              <Clock className="absolute left-3 w-4 h-4 text-red-500 z-10" />
               <input
                 type="time"
                 value={endTime}
                 onChange={handleEndTimeChange}
-                className="text-xs h-8 w-25 px-2 py-1 rounded-md bg-rose-700 border border-zinc-600 text-zinc-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 disabled={!endDate}
+                className="pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
               />
             </div>
           </div>
-
-          {(startDateTime || endDateTime) && (
-            <button
-              onClick={clearFilters}
-              className="text-sm h-10 px-3 py-2 rounded-md text-zinc-300 hover:text-white hover:bg-zinc-700 flex items-center"
-            >
-              <X className="text-sm h-4 w-4 mr-1" />
-              Clear
-            </button>
-          )}
         </div>
       </div>
+
+      {/* Clear Button */}
+      {(startDateTime || endDateTime) && (
+        <button
+          onClick={clearFilters}
+          className="w-full px-4 py-2 text-sm rounded-lg text-red-400 hover:text-white hover:bg-red-900/30 border border-red-700 transition-colors flex items-center justify-center gap-2"
+        >
+          <X className="w-4 h-4" />
+          Clear Date Filter
+        </button>
+      )}
     </div>
   )
 }

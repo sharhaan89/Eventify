@@ -153,33 +153,34 @@ const EventCreatePage = () => {
   };
 
   const handleSubmit = async () => {
-    
     if (!validateForm()) {
       return;
     }
 
     try {
-        setSubmitting(true);
-        setSubmitError(null);
+      setSubmitting(true);
+      setSubmitError(null);
 
-        const payload = {
-            title: formData.title,
-            description: formData.description,
-            venue: formData.venue,
-            fromTime: formData.fromTime,
-            toTime: formData.toTime,
-            club: formData.club
-        };
+      // Create FormData for file upload
+      const formDataToSend = new FormData();
+      formDataToSend.append('title', formData.title);
+      formDataToSend.append('description', formData.description);
+      formDataToSend.append('venue', formData.venue);
+      formDataToSend.append('fromTime', formData.fromTime);
+      formDataToSend.append('toTime', formData.toTime);
+      formDataToSend.append('club', formData.club);
+      
+      // Only append banner if it exists
+      if (formData.banner) {
+        formDataToSend.append('banner', formData.banner);
+      }
 
-        const response = await fetch(`${API_URL}/events`, {
+      const response = await fetch(`${API_URL}/events`, {
         method: 'POST',
         credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-        });
-
+        // Don't set Content-Type header - let the browser set it with boundary for FormData
+        body: formDataToSend
+      });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -201,6 +202,12 @@ const EventCreatePage = () => {
         });
         setBannerPreview(null);
         setSubmitSuccess(false);
+        
+        // Reset file input
+        const fileInput = document.querySelector('input[type="file"]');
+        if (fileInput) {
+          fileInput.value = '';
+        }
       }, 3000);
 
     } catch (err) {
@@ -257,6 +264,11 @@ const EventCreatePage = () => {
                     onClick={() => {
                       setFormData(prev => ({ ...prev, banner: null }));
                       setBannerPreview(null);
+                      // Reset file input
+                      const fileInput = document.querySelector('input[type="file"]');
+                      if (fileInput) {
+                        fileInput.value = '';
+                      }
                     }}
                     className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white p-2 rounded-full transition-colors"
                   >

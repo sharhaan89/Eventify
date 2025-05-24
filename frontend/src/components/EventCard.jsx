@@ -25,7 +25,7 @@ export default function EventCard({ event }) {
   return (
     <div className="bg-zinc-800 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 border border-zinc-700">
       <div className="relative h-48">
-        <img src={event.image || "../images/placeholder.png"} alt={event.title.length > 30 ? event.title.slice(0, 30) + "..." : event.title} className="w-full h-full object-cover" />
+        <img src={event.banner?.url || "/images/placeholder.jpg"} alt={event.title.length > 30 ? event.title.slice(0, 30) + "..." : event.title} className="w-full h-full object-cover" />
       </div>
 
       <div className="p-4">

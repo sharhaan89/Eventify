@@ -1,6 +1,7 @@
 import Event from "../models/Event.js";
 import Venue from "../models/Venue.js";
 import User from "../models/User.js";
+import { cloudinary } from '../config/cloudinary.js';
 
 export async function handleCreateEvent(req, res) {
   try {
@@ -11,12 +12,15 @@ export async function handleCreateEvent(req, res) {
     const { title, description, venue, fromTime, toTime, club } = req.body;
 
     // Basic validation for required fields
-    if (!title || !venue || !fromTime || !toTime || !club ) {
-        console.log(title);
-        console.log(venue);
-        console.log(fromTime);
-        console.log(toTime);
-        console.log(club);
+    if (!title || !venue || !fromTime || !toTime || !club) {
+      // If validation fails and we have an uploaded file, delete it from Cloudinary
+      if (req.file && req.file.public_id) {
+        try {
+          await cloudinary.uploader.destroy(req.file.public_id);
+        } catch (deleteError) {
+          console.error('Error deleting uploaded file:', deleteError);
+        }
+      }
       return res.status(400).json({ message: "Missing required fields" });
     }
 
@@ -24,6 +28,14 @@ export async function handleCreateEvent(req, res) {
     const to = new Date(toTime);
 
     if (from > to) {
+      // Delete uploaded file if validation fails
+      if (req.file && req.file.public_id) {
+        try {
+          await cloudinary.uploader.destroy(req.file.public_id);
+        } catch (deleteError) {
+          console.error('Error deleting uploaded file:', deleteError);
+        }
+      }
       return res.status(400).json({ message: "'fromTime' must be before 'toTime'" });
     }
 
@@ -35,13 +47,32 @@ export async function handleCreateEvent(req, res) {
     });
 
     if (conflictingLog) {
+      // Delete uploaded file if validation fails
+      if (req.file && req.file.public_id) {
+        try {
+          await cloudinary.uploader.destroy(req.file.public_id);
+        } catch (deleteError) {
+          console.error('Error deleting uploaded file:', deleteError);
+        }
+      }
       return res.status(409).json({ message: "Room is already booked during the requested time period." });
     }
 
-    // Create the event with createdBy from req.user._id
+    // Prepare banner data
+    let bannerData = null;
+    if (req.file) {
+      bannerData = {
+        url: req.file.path, // Cloudinary URL
+        publicId: req.file.public_id, // For future deletion if needed
+        originalName: req.file.originalname
+      };
+    }
+
+    // Create the event
     const newEvent = new Event({
       title,
       description,
+      banner: bannerData,
       venue,
       fromTime: from,
       toTime: to,
@@ -51,10 +82,35 @@ export async function handleCreateEvent(req, res) {
 
     await newEvent.save();
 
-    res.status(201).json({ message: "Event created successfully!", event: newEvent });
+    res.status(201).json({ 
+      message: "Event created successfully!", 
+      event: newEvent 
+    });
+
   } catch (err) {
     console.error("Error creating event:", err);
+    
+    // If there's an error and we have an uploaded file, try to delete it
+    if (req.file && req.file.public_id) {
+      try {
+        await cloudinary.uploader.destroy(req.file.public_id);
+      } catch (deleteError) {
+        console.error('Error deleting uploaded file:', deleteError);
+      }
+    }
+    
     res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+// Optional: Function to delete old banner when updating event
+export async function deleteBannerFromCloudinary(publicId) {
+  try {
+    const result = await cloudinary.uploader.destroy(publicId);
+    return result;
+  } catch (error) {
+    console.error('Error deleting image from Cloudinary:', error);
+    throw error;
   }
 }
 

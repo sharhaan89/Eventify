@@ -10,8 +10,15 @@ const eventSchema = new mongoose.Schema({
     type: String
   },
   banner: {
-    data: Buffer,
-    contentType: String
+    url: {
+      type: String, // Cloudinary URL
+    },
+    publicId: {
+      type: String, // Cloudinary public ID for deletion
+    },
+    originalName: {
+      type: String, // Original filename
+    }
   },
   venue: {
     type: mongoose.Schema.Types.ObjectId,

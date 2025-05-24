@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useParams, Link } from "react-router-dom"
 import { MapPin, Clock, Calendar, Users, ArrowLeft, Share2, Heart, CheckCircle, AlertCircle } from 'lucide-react'
-import Navbar from "../components/Navbar.jsx"
+import Navbar from "../components/NavBar.jsx"
 import fakeEvents from "../tempdata.js"
 
 export default function EventDetails() {
@@ -156,7 +156,7 @@ export default function EventDetails() {
 
       {/* Hero Image */}
       <div className="relative w-full h-64 md:h-96 overflow-hidden">
-        <img src={event.image || "../images/placeholder.png"} alt={event.title} className="w-full h-full object-cover" />
+        <img src={event.banner?.url || "/images/placeholder.jpg"} alt={event.title} className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 to-transparent opacity-90"></div>
       </div>
 
