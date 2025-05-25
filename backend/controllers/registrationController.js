@@ -2,6 +2,7 @@
 // Use the Registration Model created
 import QRCode from 'qrcode';
 import mongoose from 'mongoose';
+import User from '../models/User.js';
 import Event from '../models/Event.js';
 import Registration from '../models/Registration.js';
 import { sendRegistrationEmail } from '../test/mailer.js';
@@ -32,11 +33,9 @@ export async function handleRegisterEvent(req, res) {
     });
      
 
-    const user = await User.findById(userId);
-    const event = await Event.findById(eventId);
-     await sendRegistrationEmailWithQR(user.email, event.title, qrCodeBase64);
-
-
+   // const user = await User.findById(userId);
+   // const event = await Event.findById(eventId);
+    
 
     res.status(201).json({
       message: 'You have registered for the event.',
@@ -131,8 +130,11 @@ export async function handleGetUserRegisteredEvents(req, res) {
 
   try {
     const registrations = await Registration.find({ user: userId })
-      .populate('event') // populate event data
-      .sort({ createdAt: -1 }); // optional: sort by registration date, latest first
+      .populate({
+        path: 'event',
+        populate: { path: 'venue' } // populate venue inside event
+      })
+      .sort({ createdAt: -1 });
 
     if (!registrations || registrations.length === 0) {
       return res.status(404).json({ message: "No registered events found." });
@@ -146,7 +148,7 @@ export async function handleGetUserRegisteredEvents(req, res) {
         checkinTime: reg.checkinTime,
         qrCode: reg.qrCode
       },
-      event: reg.event
+      event: reg.event, // this will now include venue details
     }));
 
     return res.status(200).json(result);

@@ -75,7 +75,7 @@ export default function EventDetails() {
       }, 5000);
 
     } catch (err) {
-      setRegistrationError(err.message);
+      setRegistrationError("You have already registered for this event.");
       
       // Hide the error message after 5 seconds
       setTimeout(() => {

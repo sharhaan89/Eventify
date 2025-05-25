@@ -10,7 +10,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-export const sendRegistrationEmail = async (to, eventName,qrCodeBase64) => {
+export const sendRegistrationEmail = async (to, eventName, qrCodeBase64) => {
   const mailOptions = {
     from: `"Eventify" <${process.env.EMAIL_USER}>`,
     to: to,

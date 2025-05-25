@@ -147,7 +147,7 @@ const RegisteredEventsPage = () => {
                   <div className="flex items-center">
                     <MapPin className="w-4 h-4 text-red-400 mr-2" />
                     <span className="text-sm">
-                      {registration.event.venue?.name || 'Venue TBA'}
+                      {registration.event.venue?.venueName || 'Venue TBA'}
                     </span>
                   </div>
 
