@@ -20,7 +20,9 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 //change to global database later
-mongoose.connect("mongodb://127.0.0.1:27017/Logs")
+
+const uri = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_CLUSTER}/${process.env.MONGO_DB}?retryWrites=true&w=majority&appName=${process.env.MONGO_DB}`;
+mongoose.connect(uri)
 .then(()=>{ 
   console.log("DB is connected")
 })
