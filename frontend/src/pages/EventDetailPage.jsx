@@ -53,38 +53,42 @@ export default function EventDetails() {
     setRegistrationError(null)
 
     try {
-      const res = await fetch(`${API_URL}/events/${id}/registrations`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+  const res = await fetch(`${API_URL}/events/${id}/registrations`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Failed to register for event');
-      }
-
-      const data = await res.json();
-      setRegistrationMessage('Successfully registered for the event!');
-      
-      // Hide the success message after 5 seconds
-      setTimeout(() => {
-        setRegistrationMessage(null);
-      }, 5000);
-
-    } catch (err) {
-      setRegistrationError("You have already registered for this event.");
-      
-      // Hide the error message after 5 seconds
-      setTimeout(() => {
-        setRegistrationError(null);
-      }, 5000);
-    } finally {
-      setRegistering(false);
+  if (!res.ok) {
+    const errorData = await res.json();
+    switch (res.status) {
+      case 400:
+        setRegistrationError('You have already registered for this event.');
+        break;
+      case 401:
+        setRegistrationError('Please log in before registering.');
+        break;
+      default:
+        setRegistrationError(errorData.message || 'Failed to register for event.');
     }
-  };
+    throw new Error(errorData.message || 'Failed to register for event.');
+  }
+
+  const data = await res.json();
+  setRegistrationMessage('Successfully registered for the event!');
+
+  setTimeout(() => setRegistrationMessage(null), 5000);
+
+} catch (err) {
+  // You can handle other unexpected errors here if needed
+  setTimeout(() => setRegistrationError(null), 5000);
+
+} finally {
+  setRegistering(false);
+}
+
 
   if (loading) {
     return (
