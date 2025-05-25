@@ -2,14 +2,6 @@ import { useState, useEffect } from 'react'
 import { Eye, EyeOff, LogIn } from 'lucide-react'
 import { NavLink, useNavigate } from 'react-router-dom'
 
-// Array of background images
-const backgroundImages = [
-  "../images/incident-03.jpeg",
-  "../images/incident-05.jpg",
-  "../images/nitk-1.avif",
-  "../images/nitk-2.jpg"
-]
-
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
