@@ -32,7 +32,7 @@ mongoose.connect("mongodb://127.0.0.1:27017/Logs")
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors({
-  origin: "http://localhost:5173",  // 👈 exact frontend origin
+  origin: process.env.FRONTEND_URL,
   credentials: true
 }));
 app.use(cookieParser());
