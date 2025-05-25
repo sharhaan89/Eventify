@@ -20,30 +20,52 @@ export async function handleGetCurrentUser(req, res) {
 }
 
 export async function handleUserSignup(req, res) {
-    const { username, email, password, organization, role } = req.body;
+  const { username, email, password, organization, role, gender, branch, yog } = req.body;
 
-    const existingemail = await User.findOne({ email });
-    if (existingemail) {
-    return res.status(409).json({error: "EMAIL ALREADY EXISTS"});
+  // List of allowed branches
+  const allowedBranches = ['CSE', 'MECH', 'CHEM', 'CIVIL', 'ECE', 'EEE', 'IT', 'MACS', 'META', 'MINING', 'PHY'];
+
+  // Check for missing or empty values
+  if (!username || !email || !password || !organization || !role || !gender || !branch || !yog) {
+    return res.status(400).json({ error: "All fields are required and must not be empty." });
+  }
+
+  // Optional: Validate branch
+  if (!allowedBranches.includes(branch)) {
+    return res.status(400).json({ error: "Invalid branch provided." });
+  }
+
+  try {
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
+      return res.status(409).json({ error: "EMAIL ALREADY EXISTS" });
     }
 
     const existingUser = await User.findOne({ username });
     if (existingUser) {
-    return res.status(409).json({error: "USER NAME ALREADY EXISTS"});
+      return res.status(409).json({ error: "USER NAME ALREADY EXISTS" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const sudata = new User({
-    username,
-    email,
-    password: hashedPassword,
-    organization,
-    role
+    const newUser = new User({
+      username,
+      email,
+      password: hashedPassword,
+      organization,
+      role,
+      gender,
+      branch,
+      yog
     });
 
-    await sudata.save();
-    res.status(200).json({msg: "SIGN UP CREDENTIALS ADDED TO DB"});
+    await newUser.save();
+    res.status(200).json({ msg: "SIGN UP CREDENTIALS ADDED TO DB" });
+
+  } catch (error) {
+    console.error("Signup error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 }
 
 export async function handleUserLogin(req, res) {

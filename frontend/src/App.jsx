@@ -9,6 +9,7 @@ import EventCreatePage from './pages/EventCreatePage'
 import EventEditPage from './pages/EventEditPage'
 import RegisteredEventsPage from './pages/RegisteredEventsPage'
 import DashboardPage from './pages/EventsManagerDashboardPage'
+import AnalyticsPage from './pages/AnalyticsPage'
 import CheckinPage from './pages/EventCheckinPage'
 import ErrorPage from './pages/ErrorPage'
 
@@ -29,6 +30,7 @@ function App() {
         <Route path="/events/:id/edit" element={<EventEditPage />} />
         <Route path="/events/registered" element={<RegisteredEventsPage />} />
         <Route path="/events/dashboard" element={<DashboardPage />} />
+        <Route path="/events/:eventId/analytics" element={<AnalyticsPage />} />
 
         <Route path="/checkin/:eventId/:userId" element={<CheckinPage />} />
         <Route path="*" element={<HomePage />} />

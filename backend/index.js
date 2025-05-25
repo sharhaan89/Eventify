@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 import userRoutes from './routes/userRoutes.js';
 import eventRoutes from "./routes/eventRoutes.js";
 import registrationRoutes from "./routes/registrationRoutes.js";
+import analyticsRoutes from "./routes/analyticsRoutes.js";
 import cookieParser from "cookie-parser";
 import { error } from 'console';
 
@@ -40,6 +41,7 @@ app.use(cookieParser());
 app.use('/users', userRoutes);
 app.use('/events', eventRoutes);
 app.use('/events', registrationRoutes);
+app.use('/events/analytics', analyticsRoutes);
 
 //app.use('/', qrCodeRoute);
 

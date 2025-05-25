@@ -24,6 +24,20 @@ const userSchema = new mongoose.Schema({
   organization: {
     type: String,
     required: true
+  },
+  gender: {
+    type: String,
+    enum: ['Male', 'Female', 'Other'],
+    required: false
+  },
+  branch: {
+    type: String,
+    enum: ['CSE', 'MECH', 'CHEM', 'CIVIL', 'ECE', 'EEE', 'IT', 'MACS', 'META', 'MINING', 'PHY'],
+    required: false
+  },
+  yog: {
+    type: Number, // Year of Graduation 
+    required: false
   }
 }, { timestamps: true });
 
