@@ -170,15 +170,6 @@ export default function EventDetails() {
             {/* Title and Actions */}
             <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-6">
               <h1 className="text-2xl md:text-3xl font-bold text-white">{event.title}</h1>
-              
-              <div className="flex space-x-2">
-                <button className="p-2 rounded-full bg-zinc-700 hover:bg-zinc-600 transition-colors">
-                  <Heart className="h-5 w-5 text-red-400" />
-                </button>
-                <button className="p-2 rounded-full bg-zinc-700 hover:bg-zinc-600 transition-colors">
-                  <Share2 className="h-5 w-5 text-zinc-300" />
-                </button>
-              </div>
             </div>
 
             {/* Registration Messages */}
