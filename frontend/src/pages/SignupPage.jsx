@@ -2,14 +2,6 @@ import { useState, useEffect } from "react"
 import { Eye, EyeOff, UserPlus, Check } from "lucide-react"
 import { NavLink, useNavigate } from 'react-router-dom'
 
-// Array of background images
-const backgroundImages = [
-  "../images/incident-03.jpeg",
-  "../images/incident-05.jpg",
-  "../images/nitk-1.avif",
-  "../images/nitk-2.jpg"
-]
-
 // Branch options based on schema
 const branchOptions = [
   'CSE', 'MECH', 'CHEM', 'CIVIL', 'ECE', 'EEE', 'IT', 'MACS', 'META', 'MINING', 'PHY'
