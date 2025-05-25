@@ -33,15 +33,6 @@ export default function SignupPage() {
   const navigate = useNavigate()
   const API_URL = import.meta.env.VITE_API_URL
 
-  // Change background image every 2.5 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentBgIndex((prevIndex) => (prevIndex === backgroundImages.length - 1 ? 0 : prevIndex + 1))
-    }, 2500)
-
-    return () => clearInterval(interval)
-  }, [])
-
   // Check if passwords match
   useEffect(() => {
     if (formData.confirmPassword) {
@@ -150,14 +141,6 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden py-8">
-      {/* Background image with fade effect */}
-      <div
-        className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out"
-        style={{
-          backgroundImage: `url(${backgroundImages[currentBgIndex]})`,
-          opacity: 0.7,
-        }}
-      />
 
       {/* Overlay */}
       <div className="absolute inset-0 bg-black opacity-60" />
