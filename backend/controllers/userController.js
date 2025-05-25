@@ -86,11 +86,12 @@ export async function handleUserLogin(req, res) {
 
     // Send JWT as HTTP-only cookie
     res.cookie("token", token, {
-      httpOnly: true,    
-      //secure: process.env.NODE_ENV === "production", // use HTTPS in prod
-      sameSite: "strict",    
+      httpOnly: true,
+      secure: true,          
+      sameSite: "None",       // allows cross-origin cookies
       maxAge: 60 * 60 * 1000 * 24
     });
+
 
     res.status(200).json({ message: "Login successful" });
   } catch (err) {
