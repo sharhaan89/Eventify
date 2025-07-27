@@ -23,21 +23,21 @@ const userSchema = new mongoose.Schema({
   },
   organization: {
     type: String,
-    required: true
+    required: false
   },
   gender: {
     type: String,
     enum: ['Male', 'Female', 'Other'],
-    required: false
+    required: true
   },
   branch: {
     type: String,
     enum: ['CSE', 'MECH', 'CHEM', 'CIVIL', 'ECE', 'EEE', 'IT', 'MACS', 'META', 'MINING', 'PHY'],
-    required: false
+    required: true
   },
   yog: {
     type: Number, // Year of Graduation 
-    required: false
+    required: true
   }
 }, { timestamps: true });
 

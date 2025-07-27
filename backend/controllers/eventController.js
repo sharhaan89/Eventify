@@ -1,6 +1,7 @@
 import Event from "../models/Event.js";
 import Venue from "../models/Venue.js";
 import User from "../models/User.js";
+import mongoose from "mongoose";
 import { cloudinary } from '../config/cloudinary.js';
 
 export async function handleCreateEvent(req, res) {
