@@ -1,6 +1,5 @@
 import { useEffect } from "react"
 import axios from "axios"
-import NavBar from "../components/NavBar.jsx"
 import EventCard from "../components/EventCard"
 import { useState } from "react"
 import { Calendar, MapPin, Filter, Search, X } from "lucide-react"
@@ -39,7 +38,7 @@ export default function EventListPage() {
   }, []);
 
   // Get unique locations and clubs for the filter
-  const locations = [...new Set(events.map((event) => event.venue.venueName))]
+  const locations = [...new Set(events.map((event) => event.venue?.venueName))]
   const clubs = [...new Set(events.map((event)=> event.club))]
 
   // Filter events based on date range and locations
@@ -50,7 +49,7 @@ export default function EventListPage() {
       (!endDateTime || new Date(event.toTime) <= endDateTime)
 
     // Location filtering
-    const locationFilter = selectedLocations.length === 0 || selectedLocations.includes(event.venue.venueName)
+    const locationFilter = selectedLocations.length === 0 || selectedLocations.includes(event.venue?.venueName)
 
     // Club filtering
     const clubFilter = selectedClubs.length === 0 || selectedClubs.includes(event.club)
@@ -77,7 +76,6 @@ export default function EventListPage() {
 
 return (
     <div className="min-h-screen bg-black text-white">
-      <NavBar />
       
       {/* Header */}
       <div className="bg-gray-900 border-b-2 border-red-600">

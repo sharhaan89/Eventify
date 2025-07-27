@@ -222,7 +222,7 @@ export default function EventDetails() {
                     <MapPin className="h-5 w-5 mr-3 text-rose-400 mt-0.5" />
                     <div>
                       <h3 className="font-medium text-white">Location</h3>
-                      <p className="text-zinc-300">{event.venue.venueName}</p>
+                      <p className="text-zinc-300">{event.venue?.venueName}</p>
                     </div>
                   </div>
 

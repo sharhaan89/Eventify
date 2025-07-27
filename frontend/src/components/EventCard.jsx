@@ -34,7 +34,7 @@ export default function EventCard({ event }) {
         <div className="text-sm text-zinc-300 mb-3 space-y-2">
           <p className="flex items-center">
             <MapPin className="h-4 w-4 mr-1 text-zinc-400" />
-            <span className="line-clamp-1">{event.venue.venueName}</span>
+            <span className="line-clamp-1">{event.venue?.venueName}</span>
           </p>
 
           <p className="flex items-start">
