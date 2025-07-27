@@ -81,14 +81,14 @@ export async function handleUserLogin(req, res) {
     const token = jwt.sign(
       { id: user._id, role: user.role, organization: user.organization },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "24h" }
     );
 
     // Send JWT as HTTP-only cookie
     res.cookie("token", token, {
       httpOnly: true,    
-      //secure: process.env.NODE_ENV === "production", // use HTTPS in prod
-      sameSite: "strict",    
+      secure: true,
+      sameSite: "none",    
       maxAge: 60 * 60 * 1000 * 24
     });
 
