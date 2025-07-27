@@ -97,9 +97,9 @@ export async function handleUserCheckIn(req, res) {
     const event = await Event.findOne({ _id: eventId});
     const currentUser = req.user;
 
-    //if(event.club.toString() !== currentUser.organization.toString()) {
-      //  return res.status(403).json({message: "Access denied."});
-    //}
+    if(currentUser.role != 'Manager' || event.club.toString() !== currentUser.organization.toString()) {
+        return res.status(403).json({message: "Access denied."});
+    }
 
     if(registration.isCheckedIn) {
       return res.status(409).json({message: "User already checked in."});
