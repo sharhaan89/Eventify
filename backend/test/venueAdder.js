@@ -3,7 +3,7 @@ import Venue from "../models/Venue.js";
 
 async function addVenue() {
   try {
-    await mongoose.connect("mongodb+srv://prem:password1234@cluster0.d6dyzbl.mongodb.net/trail5"); // Await connection
+    await mongoose.connect("mongodb+srv://sksharhaannaim89:DqKpP1wv7Y5M9QbD@logs.ltjibis.mongodb.net/Logs?retryWrites=true&w=majority&appName=Logs"); // Await connection
 
     const newVenue = new Venue({
       venueName: "Silver Jubilee Auditorium",

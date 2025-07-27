@@ -9,7 +9,6 @@ import DateFilter from "../components/DateFilter"
 import LocationFilter from "../components/LocationFilter"
 import ClubFilter from "../components/ClubFilter"
 import { NavLink } from "react-router-dom"
-import fakeEvents from "../tempdata.js"
 
 export default function EventListPage() {
 
